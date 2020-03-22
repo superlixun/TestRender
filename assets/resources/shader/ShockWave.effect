@@ -1,0 +1,81 @@
+CCEffect %{
+  techniques:
+  - passes:
+    - vert: vs
+      frag: fs
+      blendState:
+        targets:
+        - blend: true
+      rasterizerState:
+        cullMode: none
+      properties:
+        texture: { value: white }
+        iWidth : { value: 0.05 }
+        iTime : { value: 0.0 }
+}%
+
+CCProgram vs %{
+    precision highp float;
+
+    #include <cc-global>
+    #include <cc-local>
+    
+    in vec3 a_position;
+    in vec2 a_uv0;
+    out vec2 v_uv0;
+
+    void main () {
+        vec4 pos = vec4(a_position, 1);
+
+        #if CC_USE_MODEL
+        pos = cc_matViewProj * cc_matWorld * pos;
+        #else
+        pos = cc_matViewProj * pos;
+        #endif
+        v_uv0 = a_uv0;
+        gl_Position = pos;
+    }
+}%
+
+CCProgram fs %{
+    precision highp float;
+
+    #include <cc-global>
+
+    uniform sampler2D texture;
+    varying vec2 v_uv0;
+    uniform PROPERTIES {
+        float iWidth;
+        float iTime;
+    }
+    
+    void main()
+    {
+        // 通过当前的uv坐标计算扩散的方向
+        vec2 center = vec2(0.5, 0.5);
+        vec2 dir = center - v_uv0.xy;
+        // Aspect的作用是对圆进行修正，保证在不同的分辨率下都为正圆
+        float edgeWidth = length(vec2(dir.x * 1.7, dir.y)) - iWidth; // 这个1.7是屏幕的width/height所得，下边代码是想使用文档给的参数计算，但是不正确，可以使用参数的方式设置。
+        // float edgeWidth = length(vec2(dir.x * (cc_screenScale.x / cc_screenScale.y), dir.y)) - iWidth;
+        //计算uv坐标偏移 
+        float width = mod(iTime, 1.0); // 这里使用 cc_time 不生效，我也是很蒙啊。只能用参数
+        float sinX = width + edgeWidth;
+        // 正弦函数：2d*sin(2π/4d x)
+        float weight = 2.0 * width * sin(3.14 / (2.0 * width) * sinX); 
+        // 偏移量 = 偏移方向 * 偏移权重
+        vec2 offsetUV = dir * weight;             
+
+        //最后uv取值，判断是否在环形区域内，环形区域外直接取原来uv，区域内计算偏移值
+        vec2 resultUV = v_uv0.xy;
+        if (abs(edgeWidth) > width && abs(edgeWidth) < width + iWidth)
+        {
+            resultUV.x = v_uv0.x * 0.5 + (v_uv0.x + offsetUV.x) * 0.5;
+            resultUV.y = v_uv0.y * 0.5 + (v_uv0.y + offsetUV.y) * 0.5;
+        } 
+        // resultUV.x = lerp(v_uv0.x, v_uv0.x + offsetUV.x, step(abs(edgeWidth) > width, 0.5));
+
+        vec4 c = texture2D(texture, resultUV);
+
+        gl_FragColor = c;
+    }
+}%

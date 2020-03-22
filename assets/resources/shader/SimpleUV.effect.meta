@@ -1,0 +1,17 @@
+{
+  "ver": "1.0.23",
+  "uuid": "d4c999d4-4aec-42ce-8ee7-b57bae795db7",
+  "compiledShaders": [
+    {
+      "glsl1": {
+        "vert": "\nprecision highp float;\nuniform mat4 cc_matViewProj;\nuniform mat4 cc_matWorld;\n\nattribute vec3 a_position;\nattribute vec2 a_uv0;\nvarying vec2 v_uv0;\n\nvoid main () {\n    vec4 pos = vec4(a_position, 1);\n\n    #if CC_USE_MODEL\n    pos = cc_matViewProj * cc_matWorld * pos;\n    #else\n    pos = cc_matViewProj * pos;\n    #endif\n    v_uv0 = a_uv0;\n    gl_Position = pos;\n}\n",
+        "frag": "\nprecision highp float;\nuniform vec4 cc_time;\n\nuniform sampler2D texture;\nvarying vec2 v_uv0;\nuniform float iSpeedX;\nuniform float iSpeedY;\nvoid main()\n{\n    vec2 cuv = v_uv0.xy;\n    cuv.x = mod(v_uv0.x + iSpeedX * cc_time.x, 1.0);\n    cuv.y = mod(v_uv0.y + iSpeedY * cc_time.x, 1.0);\n    vec4 c = texture2D(texture, cuv);\n    gl_FragColor = c;\n}\n"
+      },
+      "glsl3": {
+        "vert": "\nprecision highp float;\nuniform CCGlobal {\n  vec4 cc_time;\n\n  vec4 cc_screenSize;\n\n  vec4 cc_screenScale;\n\n  vec4 cc_nativeSize;\n\n  mat4 cc_matView;\n  mat4 cc_matViewInv;\n  mat4 cc_matProj;\n  mat4 cc_matProjInv;\n  mat4 cc_matViewProj;\n  mat4 cc_matViewProjInv;\n  vec4 cc_cameraPos;\n\n  vec4 cc_exposure;\n\n  vec4 cc_mainLitDir;\n\n  vec4 cc_mainLitColor;\n\n  vec4 cc_ambientSky;\n  vec4 cc_ambientGround;\n};\nuniform CCLocal {\n  mat4 cc_matWorld;\n  mat4 cc_matWorldIT;\n};\n\nin vec3 a_position;\nin vec2 a_uv0;\nout vec2 v_uv0;\n\nvoid main () {\n    vec4 pos = vec4(a_position, 1);\n\n    #if CC_USE_MODEL\n    pos = cc_matViewProj * cc_matWorld * pos;\n    #else\n    pos = cc_matViewProj * pos;\n    #endif\n    v_uv0 = a_uv0;\n    gl_Position = pos;\n}\n",
+        "frag": "\nprecision highp float;\nuniform CCGlobal {\n  vec4 cc_time;\n\n  vec4 cc_screenSize;\n\n  vec4 cc_screenScale;\n\n  vec4 cc_nativeSize;\n\n  mat4 cc_matView;\n  mat4 cc_matViewInv;\n  mat4 cc_matProj;\n  mat4 cc_matProjInv;\n  mat4 cc_matViewProj;\n  mat4 cc_matViewProjInv;\n  vec4 cc_cameraPos;\n\n  vec4 cc_exposure;\n\n  vec4 cc_mainLitDir;\n\n  vec4 cc_mainLitColor;\n\n  vec4 cc_ambientSky;\n  vec4 cc_ambientGround;\n};\n\nuniform sampler2D texture;\nvarying vec2 v_uv0;\nuniform PROPERTIES {\n    float iSpeedX;\n    float iSpeedY;\n}\n\nvoid main()\n{\n    vec2 cuv = v_uv0.xy;\n    cuv.x = mod(v_uv0.x + iSpeedX * cc_time.x, 1.0);\n    cuv.y = mod(v_uv0.y + iSpeedY * cc_time.x, 1.0);\n    vec4 c = texture2D(texture, cuv);\n    gl_FragColor = c;\n}\n"
+      }
+    }
+  ],
+  "subMetas": {}
+}

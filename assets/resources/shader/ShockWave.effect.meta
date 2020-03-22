@@ -1,0 +1,17 @@
+{
+  "ver": "1.0.23",
+  "uuid": "ee032677-3d3a-4fd5-839d-8b0d4d7755af",
+  "compiledShaders": [
+    {
+      "glsl1": {
+        "vert": "\nprecision highp float;\nuniform mat4 cc_matViewProj;\nuniform mat4 cc_matWorld;\n\nattribute vec3 a_position;\nattribute vec2 a_uv0;\nvarying vec2 v_uv0;\n\nvoid main () {\n    vec4 pos = vec4(a_position, 1);\n\n    #if CC_USE_MODEL\n    pos = cc_matViewProj * cc_matWorld * pos;\n    #else\n    pos = cc_matViewProj * pos;\n    #endif\n    v_uv0 = a_uv0;\n    gl_Position = pos;\n}\n",
+        "frag": "\nprecision highp float;\n\nuniform sampler2D texture;\nvarying vec2 v_uv0;\nuniform float iWidth;\nuniform float iTime;\nvoid main()\n{\n\n    vec2 center = vec2(0.5, 0.5);\n    vec2 dir = center - v_uv0.xy;\n\n    float edgeWidth = length(vec2(dir.x * 1.7, dir.y)) - iWidth;\n\n    float width = mod(iTime, 1.0);\n\n    float sinX = width + edgeWidth;\n\n    float weight = 2.0 * width * sin(3.14 / (2.0 * width) * sinX);\n\n    vec2 offsetUV = dir * weight;\n\n    vec2 resultUV = v_uv0.xy;\n    if (abs(edgeWidth) > width && abs(edgeWidth) < width + iWidth)\n    {\n        resultUV.x = v_uv0.x * 0.5 + (v_uv0.x + offsetUV.x) * 0.5;\n        resultUV.y = v_uv0.y * 0.5 + (v_uv0.y + offsetUV.y) * 0.5;\n    }\n\n    vec4 c = texture2D(texture, resultUV);\n\n    gl_FragColor = c;\n}\n"
+      },
+      "glsl3": {
+        "vert": "\nprecision highp float;\nuniform CCGlobal {\n  vec4 cc_time;\n\n  vec4 cc_screenSize;\n\n  vec4 cc_screenScale;\n\n  vec4 cc_nativeSize;\n\n  mat4 cc_matView;\n  mat4 cc_matViewInv;\n  mat4 cc_matProj;\n  mat4 cc_matProjInv;\n  mat4 cc_matViewProj;\n  mat4 cc_matViewProjInv;\n  vec4 cc_cameraPos;\n\n  vec4 cc_exposure;\n\n  vec4 cc_mainLitDir;\n\n  vec4 cc_mainLitColor;\n\n  vec4 cc_ambientSky;\n  vec4 cc_ambientGround;\n};\nuniform CCLocal {\n  mat4 cc_matWorld;\n  mat4 cc_matWorldIT;\n};\n\nin vec3 a_position;\nin vec2 a_uv0;\nout vec2 v_uv0;\n\nvoid main () {\n    vec4 pos = vec4(a_position, 1);\n\n    #if CC_USE_MODEL\n    pos = cc_matViewProj * cc_matWorld * pos;\n    #else\n    pos = cc_matViewProj * pos;\n    #endif\n    v_uv0 = a_uv0;\n    gl_Position = pos;\n}\n",
+        "frag": "\nprecision highp float;\nuniform CCGlobal {\n  vec4 cc_time;\n\n  vec4 cc_screenSize;\n\n  vec4 cc_screenScale;\n\n  vec4 cc_nativeSize;\n\n  mat4 cc_matView;\n  mat4 cc_matViewInv;\n  mat4 cc_matProj;\n  mat4 cc_matProjInv;\n  mat4 cc_matViewProj;\n  mat4 cc_matViewProjInv;\n  vec4 cc_cameraPos;\n\n  vec4 cc_exposure;\n\n  vec4 cc_mainLitDir;\n\n  vec4 cc_mainLitColor;\n\n  vec4 cc_ambientSky;\n  vec4 cc_ambientGround;\n};\n\nuniform sampler2D texture;\nvarying vec2 v_uv0;\nuniform PROPERTIES {\n    float iWidth;\n    float iTime;\n}\n\nvoid main()\n{\n\n    vec2 center = vec2(0.5, 0.5);\n    vec2 dir = center - v_uv0.xy;\n\n    float edgeWidth = length(vec2(dir.x * 1.7, dir.y)) - iWidth;\n\n    float width = mod(iTime, 1.0);\n\n    float sinX = width + edgeWidth;\n\n    float weight = 2.0 * width * sin(3.14 / (2.0 * width) * sinX);\n\n    vec2 offsetUV = dir * weight;\n\n    vec2 resultUV = v_uv0.xy;\n    if (abs(edgeWidth) > width && abs(edgeWidth) < width + iWidth)\n    {\n        resultUV.x = v_uv0.x * 0.5 + (v_uv0.x + offsetUV.x) * 0.5;\n        resultUV.y = v_uv0.y * 0.5 + (v_uv0.y + offsetUV.y) * 0.5;\n    }\n\n    vec4 c = texture2D(texture, resultUV);\n\n    gl_FragColor = c;\n}\n"
+      }
+    }
+  ],
+  "subMetas": {}
+}

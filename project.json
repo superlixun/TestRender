@@ -1,0 +1,8 @@
+{
+  "engine": "cocos2d-html5",
+  "packages": "packages",
+  "version": "2.2.2",
+  "name": "TestRender",
+  "uuid": "13db673d-14aa-48fd-9ceb-6c2a98ab4a3b",
+  "id": "5b751f78-c844-4025-aa2a-44b3bf2d728c"
+}
